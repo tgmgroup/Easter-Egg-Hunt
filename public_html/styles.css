@@ -1,0 +1,44 @@
+/* 
+    Document   : styles
+    Created on : 2013-03-22, 15:56:04
+    Author     : goobar
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+root { 
+	display: block;
+}
+
+canvas#gameWindow
+{
+	background-color: black;
+	border-color: white;
+	border-style: solid;
+}
+
+img
+{
+	display: none;
+}
+
+body
+{
+	background-image: url("images/background.jpg");
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-color: greenyellow;
+}
+
+#content
+{
+	width: 1024px;
+	height: 768px;
+	margin: auto;
+}
+
+audio
+{
+	display: none;
+}

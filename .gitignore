@@ -63,13 +63,3 @@ fabric.properties
 .idea/sonarlint
 
 # End of https://www.gitignore.io/api/webstorm
-.gitignore
-.idea/
-nbproject/
-public_html/
-.idea/.name
-.idea/eeggs.iml
-.idea/encodings.xml
-.idea/misc.xml
-.idea/modules.xml
-.idea/workspace.xml
