@@ -4,401 +4,387 @@ and open the template in the editor.
 -->
 <!DOCTYPE html>
 <html>
-	<head>
-		<title></title>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<link rel="stylesheet" href="styles.css"/>
-		<script src="js/libs/jquery-1.9.0/jquery.min.js"></script>
-		<link rel="stylesheet" href="js/libs/Messi/messi.min.css" />
-		<script src="js/libs/Messi/messi.min.js"></script>
+
+<head>
+    <title></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="stylesheet" href="styles.css" />
+    <script src="js/libs/jquery-1.9.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="js/libs/Messi/messi.min.css" />
+    <script src="js/libs/Messi/messi.min.js"></script>
 
 
-		<script>
-			/////////////////////////////////////////////////////
-			// CONSTANTS - CHANGE VALUES TO CONFIGURE THIS APP //
-			/////////////////////////////////////////////////////
-			var NUMBER_OF_EGGS = 20;
-			var NUMBER_OF_BUSHES = 10;
-			var NUMBER_OF_TREES = 2;
+    <script>
+        /////////////////////////////////////////////////////
+        // CONSTANTS - CHANGE VALUES TO CONFIGURE THIS APP //
+        /////////////////////////////////////////////////////
+        var NUMBER_OF_EGGS = 10;
+        var NUMBER_OF_BUSHES = 10;
+        var NUMBER_OF_TREES = 5;
 
-			var EGG_IMAGE_ID = "#easterEgg";
-			var BUSH_IMAGE_ID = "#bush";
-			var TREE_IMAGE_ID = "#tree";
-			var EGG_PICKED_UP_SOUND_ID = "#eggPickedUpSound";
-			var BACKGROUND_SOUND_ID = "#backgroundSound";
-			var SUCCES_SOUND_ID = "#successSound";
-			var GAME_WINDOW_ID = "#gameWindow";
-			var BACKGROUND_ID = "#background";
+        var EGG_IMAGE_ID = "#easterEgg";
+        var BUSH_IMAGE_ID = "#bush";
+        var TREE_IMAGE_ID = "#tree";
+        var EGG_PICKED_UP_SOUND_ID = "#eggPickedUpSound";
+        var BACKGROUND_SOUND_ID = "#backgroundSound";
+        var SUCCES_SOUND_ID = "#successSound";
+        var GAME_WINDOW_ID = "#gameWindow";
+        var BACKGROUND_ID = "#background";
 
-			var Y_BUSH_MOUSE_MOVE_LIMIT = 550;
+        var Y_BUSH_MOUSE_MOVE_LIMIT = 550;
 
-			var X_BUSH_RANDOM_START = 0;
-			var X_BUSH_RANDOM_END = 900;
-			var Y_BUSH_RANDOM_START = 300;
-			var Y_BUSH_RANDOM_END = 500;
+        var X_BUSH_RANDOM_START = 0;
+        var X_BUSH_RANDOM_END = 900;
+        var Y_BUSH_RANDOM_START = 300;
+        var Y_BUSH_RANDOM_END = 500;
 
-			var X_EGG_RANDOM_START = 0;
-			var X_EGG_RANDOM_END = 900;
-			var Y_EGG_RANDOM_START = 500;
-			var Y_EGG_RANDOM_END = 700;
+        var X_EGG_RANDOM_START = 0;
+        var X_EGG_RANDOM_END = 900;
+        var Y_EGG_RANDOM_START = 500;
+        var Y_EGG_RANDOM_END = 700;
 
-			var X_TREE_RANDOM_START = 0;
-			var X_TREE_RANDOM_END = 900;
-			var Y_TREE_RANDOM_START = 100;
-			var Y_TREE_RANDOM_END = 200;
+        var X_TREE_RANDOM_START = 0;
+        var X_TREE_RANDOM_END = 900;
+        var Y_TREE_RANDOM_START = 50;
+        var Y_TREE_RANDOM_END = 200;
 
-			var SCORE_STROKE_STYLE = "black";
-			var SCORE_FILL_STYLE = "green";
-			var SCORE_FONT_STYLE = "bold 50px sans-serif";
-			var SCORE_FONT_X_OFFSET = 210;
-			var SCORE_FONT_Y_OFFSET = 50;
-			var SCORE_EGG_X_OFFSET = 50;
-			var SCORE_EGG_Y_OFFSET = 10;
-			var SCORE_EGG_WIDTH = 50;
-			var SCORE_EGG_HEIGHT = 42;
+        var SCORE_STROKE_STYLE = "black";
+        var SCORE_FILL_STYLE = "green";
+        var SCORE_FONT_STYLE = "bold 50px sans-serif";
+        var SCORE_FONT_X_OFFSET = 210;
+        var SCORE_FONT_Y_OFFSET = 50;
+        var SCORE_EGG_X_OFFSET = 50;
+        var SCORE_EGG_Y_OFFSET = 10;
+        var SCORE_EGG_WIDTH = 50;
+        var SCORE_EGG_HEIGHT = 42;
 
-			var SUCCESS_MSG_HEADER = "Znalazłeś wszystkie jajka!";
-			var SUCCESS_MSG_PREFIX = "Gratulacje! Znalazłeś wszystkie jajka!<br/>Twój czas to ";
-			var SUCCESS_MSG_SUFIX = " sek<br/><a href='index.html'>Zagraj ponownie</a>";
-
-
-
-			///////////////
-			// VARIABLES //
-			///////////////
-			var objectTypes = {bush: 0, tree: 1, egg: 2};
-			var bushes = new Array();
-			var trees = new Array();
-			var eggs = new Array();
-			var collectedEggs = 0;
-			var startTime = new Date().getTime();
-			var moveObject = false;
-			var clickedObject = null;
-			var canvasWidth = 0;
-			var canvasHeight = 0;
+        var SUCCESS_MSG_HEADER = "<p align=center>Congratulations!</p>";
+        var SUCCESS_MSG_PREFIX = "<p align=center>You found all the eggs! Your time was</p><p align=center>";
+        var SUCCESS_MSG_SUFIX = " second(s).</p><p align=center>Would you like to play again?<br/><a href='index.html'>Yes</a></p>";
 
 
 
-			///////////////
-			// FUNCTIONS //
-			///////////////
-			function updateNumberOfCollectedEggs(context)
-			{
-				var oldFont = context.font;
-				var oldStrokeStyle = context.strokeStyle;
-				var oldFillStyle = context.fillStyle;
-				context.strokeStyle = SCORE_STROKE_STYLE;
-				context.font = SCORE_FONT_STYLE;
-				context.fillStyle = SCORE_FILL_STYLE;
-				var scoreMsg = collectedEggs + " / " + NUMBER_OF_EGGS;
-				context.strokeText(scoreMsg, canvasWidth - SCORE_FONT_X_OFFSET, SCORE_FONT_Y_OFFSET);
-				context.fillText(scoreMsg, canvasWidth - SCORE_FONT_X_OFFSET, SCORE_FONT_Y_OFFSET);
-				drawImage($(EGG_IMAGE_ID)[0], context, canvasWidth - SCORE_EGG_X_OFFSET, SCORE_EGG_Y_OFFSET, SCORE_EGG_WIDTH, SCORE_EGG_HEIGHT);
-				context.font = oldFont;
-				context.strokeStyle = oldStrokeStyle;
-				context.fillStyle = oldFillStyle;
-			}
-			function drawImage(image, context, x, y, scaleX, scaleY)
-			{
-				if ((scaleX === undefined) || (scaleY === undefined))
-				{
-					context.drawImage(image, x, y);
-				}
-				else
-				{
-					context.drawImage(image, x, y, scaleX, scaleY);
-				}
-			}
-			function randomInteger(start, end)
-			{
-				var result = Math.floor(Math.random() * (end - start + 1) + start);
-				return result;
-			}
-			function objectCenter(object)
-			{
-				var objImg = object.img;
-				var x = object.x;
-				var y = object.y;
-				var xCenter = x + Math.floor(objImg.width / 2);
-				var yCenter = y + Math.floor(objImg.height / 2);
-				var result = {xCenter: xCenter, yCenter: yCenter};
-				return result;
-			}
-			function updateObjCenter(obj)
-			{
-				var objCenter = objectCenter(obj);
-				var xCenter = objCenter.xCenter;
-				var yCenter = objCenter.yCenter;
-				obj.xCenter = xCenter;
-				obj.yCenter = yCenter;
-			}
-			function determineObject(objectType)
-			{
-				var objectsArray = null;
-				if (objectType === objectTypes.bush)
-				{
-					objectsArray = bushes;
-				}
-				if (objectType === objectTypes.tree)
-				{
-					objectsArray = trees;
-				}
-				if (objectType === objectTypes.egg)
-				{
-					objectsArray = eggs;
-				}
-				return objectsArray;
-			}
-			function randomizeObjects(numberOfObjects, objectType, objectImage, startX, endX, startY, endY)
-			{
-				var objectsArray = determineObject(objectType);
-				for (var i = 0; i < numberOfObjects; i++)
-				{
-					var randomX = randomInteger(startX, endX);
-					var randomY = randomInteger(startY, endY);
-					var randomizedObject = {x: randomX, y: randomY, zIndex: i, img: objectImage, type: objectType};
-					updateObjCenter(randomizedObject);
-					objectsArray.push(randomizedObject);
-				}
-			}
-			function drawObjects(objects, context)
-			{
-				for (var i = 0; i < objects.length; i++)
-				{
-					var object = objects[i];
-					drawImage(object.img, context, object.x, object.y);
-				}
-			}
-			function drawAllObjects(context)
-			{
-				drawObjects(eggs, context);
-				drawObjects(trees, context);
-				drawObjects(bushes, context);
-			}
-			function euclDist(x0, y0, x1, y1)
-			{
-				var result = Math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
-				return result;
-			}
-			function getObjectUnderMouse(x, y, objectType)
-			{
-				var objects = determineObject(objectType);
-				var objImg = null;
-				var maxDist = 0;
-				if (objects.length > 0)
-				{
-					objImg = objects[0].img;
-					maxDist = Math.floor(Math.min(objImg.width, objImg.height) / 2);
-				}
-				var topMostObject = null;
-				for (var i = 0; i < objects.length; i++)
-				{
-					var object = objects[i];
-					var currentBestDist = maxDist;
-					if (euclDist(x, y, object.xCenter, object.yCenter) < currentBestDist)
-					{
-						if (topMostObject === null)
-						{
-							topMostObject = object;
-							currentBestDist = euclDist(x, y, object.xCenter, object.yCenter);
-						}
-						else
-						{
-							if (topMostObject.zIndex < object.zIndex)
-							{
-								topMostObject = object;
-								currentBestDist = euclDist(x, y, object.xCenter, object.yCenter);
-							}
-						}
-					}
-				}
-				return topMostObject;
-			}
-			function refreshView(context)
-			{
-				drawImage($(BACKGROUND_ID)[0], context, 0, 0, false);
-				drawAllObjects(context);
-				updateNumberOfCollectedEggs(context);
-			}
-			function normalizeEvent(event)
-			{
-				if (event.offsetX === undefined)
-				{
-					event.offsetX = (event.pageX - $(GAME_WINDOW_ID).offset().left);
-					event.offsetY = (event.pageY - $(GAME_WINDOW_ID).offset().top);
-				}
-				return event;
-			}
-			function playSound(sound)
-			{
-				sound.load();
-				sound.play();
-			}
-
-			function init(context)
-			{
-				canvasWidth = $(GAME_WINDOW_ID).attr("width");
-				canvasHeight = $(GAME_WINDOW_ID).attr("height");
-				randomizeObjects(NUMBER_OF_BUSHES, objectTypes.bush, $(BUSH_IMAGE_ID)[0], X_BUSH_RANDOM_START, X_BUSH_RANDOM_END, Y_BUSH_RANDOM_START, Y_BUSH_RANDOM_END);
-				randomizeObjects(NUMBER_OF_EGGS, objectTypes.egg, $(EGG_IMAGE_ID)[0], X_EGG_RANDOM_START, X_EGG_RANDOM_END, Y_EGG_RANDOM_START, Y_EGG_RANDOM_END);
-				randomizeObjects(NUMBER_OF_TREES, objectTypes.tree, $(TREE_IMAGE_ID)[0], X_TREE_RANDOM_START, X_TREE_RANDOM_END, Y_TREE_RANDOM_START, Y_TREE_RANDOM_END);
-				refreshView(context);
-				updateNumberOfCollectedEggs(context);
-				playSound($(BACKGROUND_SOUND_ID)[0]);
-			}
+        ///////////////
+        // VARIABLES //
+        ///////////////
+        var objectTypes = {
+            bush: 0,
+            tree: 1,
+            egg: 2
+        };
+        var bushes = new Array();
+        var trees = new Array();
+        var eggs = new Array();
+        var collectedEggs = 0;
+        var startTime = new Date().getTime();
+        var moveObject = false;
+        var clickedObject = null;
+        var canvasWidth = 0;
+        var canvasHeight = 0;
 
 
 
-			/////////////////////////////////
-			// MOUSE HANDLERS - MAIN LOGIC //
-			/////////////////////////////////
-			function mouseDownHandler(event, context)
-			{
-				normalizeEvent(event);
-				var x = event.offsetX;
-				var y = event.offsetY;
-				var clickedBush = getObjectUnderMouse(x, y, objectTypes.bush);
-				if (clickedBush === null)
-				{
-					var clickedEgg = getObjectUnderMouse(x, y, objectTypes.egg);
-					if (clickedEgg !== null)
-					{
-						playSound($(EGG_PICKED_UP_SOUND_ID)[0]);
-						var eggIndex = eggs.indexOf(clickedEgg);
-						var egg = eggs[eggIndex];
-						eggs.splice(eggIndex, 1);
-						if (++collectedEggs >= NUMBER_OF_EGGS)
-						{
-							var endTime = new Date().getTime();
-							var time = Math.floor((endTime - startTime) / 1000);
-							new Messi(SUCCESS_MSG_PREFIX + time + SUCCESS_MSG_SUFIX, {title: SUCCESS_MSG_HEADER});
-							playSound($(SUCCES_SOUND_ID)[0]);
-						}
-						var newX = egg.img.width;
-						var newY = egg.img.height;
-						var animationIterations = 5;
-						var currentAnimationIteration = 0;
-						var interval = setInterval(
-							function()
-							{
-								newX *= 1.5;
-								newY *= 1.5;
-								refreshView(context);
-								drawImage(egg.img, context, egg.x, egg.y, newX, newY);
-								if (currentAnimationIteration++ >= animationIterations)
-								{
-									clearInterval(interval);
-									refreshView(context);
-								}
-							}, 15
-							);
-						refreshView(context);
-					}
-				}
-				if (clickedBush !== null)
-				{
-					moveObject = true;
-					clickedObject = clickedBush;
-				}
-			}
-			function mouseMoveHandler(event, context)
-			{
-				if (moveObject)
-				{
-					if (clickedObject !== null)
-					{
-						// only bush in movable
-						if (clickedObject.type === objectTypes.bush)
-						{
-							normalizeEvent(event);
-							var x = event.offsetX;
-							var y = event.offsetY;
-							if (y < Y_BUSH_MOUSE_MOVE_LIMIT)
-							{
-								y = Y_BUSH_MOUSE_MOVE_LIMIT;
-							}
-							clickedObject.x = x - Math.floor(clickedObject.img.width / 2);
-							clickedObject.y = y - Math.floor(clickedObject.img.height / 2);
-							updateObjCenter(clickedObject);
-							refreshView(context);
-						}
-					}
-				}
-			}
-			function mouseUpHandler()
-			{
-				moveObject = false;
-			}
+        ///////////////
+        // FUNCTIONS //
+        ///////////////
+        function updateNumberOfCollectedEggs(context) {
+            var oldFont = context.font;
+            var oldStrokeStyle = context.strokeStyle;
+            var oldFillStyle = context.fillStyle;
+            context.strokeStyle = SCORE_STROKE_STYLE;
+            context.font = SCORE_FONT_STYLE;
+            context.fillStyle = SCORE_FILL_STYLE;
+            var scoreMsg = collectedEggs + " / " + NUMBER_OF_EGGS;
+            context.strokeText(scoreMsg, canvasWidth - SCORE_FONT_X_OFFSET, SCORE_FONT_Y_OFFSET);
+            context.fillText(scoreMsg, canvasWidth - SCORE_FONT_X_OFFSET, SCORE_FONT_Y_OFFSET);
+            drawImage($(EGG_IMAGE_ID)[0], context, canvasWidth - SCORE_EGG_X_OFFSET, SCORE_EGG_Y_OFFSET, SCORE_EGG_WIDTH, SCORE_EGG_HEIGHT);
+            context.font = oldFont;
+            context.strokeStyle = oldStrokeStyle;
+            context.fillStyle = oldFillStyle;
+        }
 
-			function mouseOutHandler()
-			{
-				if (moveObject)
-				{
-					mouseUpHandler();
-				}
-			}
+        function drawImage(image, context, x, y, scaleX, scaleY) {
+            if ((scaleX === undefined) || (scaleY === undefined)) {
+                context.drawImage(image, x, y);
+            } else {
+                context.drawImage(image, x, y, scaleX, scaleY);
+            }
+        }
+
+        function randomInteger(start, end) {
+            var result = Math.floor(Math.random() * (end - start + 1) + start);
+            return result;
+        }
+
+        function objectCenter(object) {
+            var objImg = object.img;
+            var x = object.x;
+            var y = object.y;
+            var xCenter = x + Math.floor(objImg.width / 2);
+            var yCenter = y + Math.floor(objImg.height / 2);
+            var result = {
+                xCenter: xCenter,
+                yCenter: yCenter
+            };
+            return result;
+        }
+
+        function updateObjCenter(obj) {
+            var objCenter = objectCenter(obj);
+            var xCenter = objCenter.xCenter;
+            var yCenter = objCenter.yCenter;
+            obj.xCenter = xCenter;
+            obj.yCenter = yCenter;
+        }
+
+        function determineObject(objectType) {
+            var objectsArray = null;
+            if (objectType === objectTypes.bush) {
+                objectsArray = bushes;
+            }
+            if (objectType === objectTypes.tree) {
+                objectsArray = trees;
+            }
+            if (objectType === objectTypes.egg) {
+                objectsArray = eggs;
+            }
+            return objectsArray;
+        }
+
+        function randomizeObjects(numberOfObjects, objectType, objectImage, startX, endX, startY, endY) {
+            var objectsArray = determineObject(objectType);
+            for (var i = 0; i < numberOfObjects; i++) {
+                var randomX = randomInteger(startX, endX);
+                var randomY = randomInteger(startY, endY);
+                var randomizedObject = {
+                    x: randomX,
+                    y: randomY,
+                    zIndex: i,
+                    img: objectImage,
+                    type: objectType
+                };
+                updateObjCenter(randomizedObject);
+                objectsArray.push(randomizedObject);
+            }
+        }
+
+        function drawObjects(objects, context) {
+            for (var i = 0; i < objects.length; i++) {
+                var object = objects[i];
+                drawImage(object.img, context, object.x, object.y);
+            }
+        }
+
+        function drawAllObjects(context) {
+            drawObjects(eggs, context);
+            drawObjects(trees, context);
+            drawObjects(bushes, context);
+        }
+
+        function euclDist(x0, y0, x1, y1) {
+            var result = Math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
+            return result;
+        }
+
+        function getObjectUnderMouse(x, y, objectType) {
+            var objects = determineObject(objectType);
+            var objImg = null;
+            var maxDist = 0;
+            if (objects.length > 0) {
+                objImg = objects[0].img;
+                maxDist = Math.floor(Math.min(objImg.width, objImg.height) / 2);
+            }
+            var topMostObject = null;
+            for (var i = 0; i < objects.length; i++) {
+                var object = objects[i];
+                var currentBestDist = maxDist;
+                if (euclDist(x, y, object.xCenter, object.yCenter) < currentBestDist) {
+                    if (topMostObject === null) {
+                        topMostObject = object;
+                        currentBestDist = euclDist(x, y, object.xCenter, object.yCenter);
+                    } else {
+                        if (topMostObject.zIndex < object.zIndex) {
+                            topMostObject = object;
+                            currentBestDist = euclDist(x, y, object.xCenter, object.yCenter);
+                        }
+                    }
+                }
+            }
+            return topMostObject;
+        }
+
+        function refreshView(context) {
+            drawImage($(BACKGROUND_ID)[0], context, 0, 0, false);
+            drawAllObjects(context);
+            updateNumberOfCollectedEggs(context);
+        }
+
+        function normalizeEvent(event) {
+            if (event.offsetX === undefined) {
+                event.offsetX = (event.pageX - $(GAME_WINDOW_ID).offset().left);
+                event.offsetY = (event.pageY - $(GAME_WINDOW_ID).offset().top);
+            }
+            return event;
+        }
+
+        function playSound(sound) {
+            sound.load();
+            sound.play();
+        }
+
+        function init(context) {
+            canvasWidth = $(GAME_WINDOW_ID).attr("width");
+            canvasHeight = $(GAME_WINDOW_ID).attr("height");
+            randomizeObjects(NUMBER_OF_BUSHES, objectTypes.bush, $(BUSH_IMAGE_ID)[0], X_BUSH_RANDOM_START, X_BUSH_RANDOM_END, Y_BUSH_RANDOM_START, Y_BUSH_RANDOM_END);
+            randomizeObjects(NUMBER_OF_EGGS, objectTypes.egg, $(EGG_IMAGE_ID)[0], X_EGG_RANDOM_START, X_EGG_RANDOM_END, Y_EGG_RANDOM_START, Y_EGG_RANDOM_END);
+            randomizeObjects(NUMBER_OF_TREES, objectTypes.tree, $(TREE_IMAGE_ID)[0], X_TREE_RANDOM_START, X_TREE_RANDOM_END, Y_TREE_RANDOM_START, Y_TREE_RANDOM_END);
+            refreshView(context);
+            updateNumberOfCollectedEggs(context);
+            playSound($(BACKGROUND_SOUND_ID)[0]);
+        }
 
 
 
-			/////////////////////
-			// APP STARTS HERE //
-			/////////////////////
-			$(window).load(
-				function()
-				{
-					var canvas = $(GAME_WINDOW_ID);
-					var domCanvas = canvas[0];
-					var context = domCanvas.getContext("2d");
-					init(context);
-					canvas.mousedown(
-						function(event)
-						{
-							mouseDownHandler(event, context);
-						}
-					);
-					canvas.mousemove(
-						function(event)
-						{
-							mouseMoveHandler(event, context);
-						}
-					);
-					canvas.mouseup(
-						function(event)
-						{
-							mouseUpHandler();
-						}
-					);
-					canvas.mouseout(
-						function(event)
-						{
-							mouseOutHandler();
-						}
-					);
-				}
-			);
-		</script>
-	</head>
-	<body>
-		<div id="content">
-			<div id="imgContainer">
-				<img id="bush" src="images/bush0.png"/>
-				<img id="tree" src="images/tree0.png"/>
-				<img id="background" src="images/background.png"/>
-				<img id="easterEgg" src="images/easter-egg.png"/>
-			</div>
-			<div id="soundContainer">
-				<audio id="eggPickedUpSound">
+        /////////////////////////////////
+        // MOUSE HANDLERS - MAIN LOGIC //
+        /////////////////////////////////
+        function mouseDownHandler(event, context) {
+            normalizeEvent(event);
+            var x = event.offsetX;
+            var y = event.offsetY;
+            var clickedBush = getObjectUnderMouse(x, y, objectTypes.bush);
+            if (clickedBush === null) {
+                var clickedEgg = getObjectUnderMouse(x, y, objectTypes.egg);
+                if (clickedEgg !== null) {
+                    playSound($(EGG_PICKED_UP_SOUND_ID)[0]);
+                    var eggIndex = eggs.indexOf(clickedEgg);
+                    var egg = eggs[eggIndex];
+                    eggs.splice(eggIndex, 1);
+                    if (++collectedEggs >= NUMBER_OF_EGGS) {
+                        var endTime = new Date().getTime();
+                        var time = Math.floor((endTime - startTime) / 1000);
+                        new Messi(SUCCESS_MSG_PREFIX + time + SUCCESS_MSG_SUFIX, {
+                            title: SUCCESS_MSG_HEADER
+                        });
+                        playSound($(SUCCES_SOUND_ID)[0]);
+                    }
+                    var newX = egg.img.width;
+                    var newY = egg.img.height;
+                    var animationIterations = 5;
+                    var currentAnimationIteration = 0;
+                    var interval = setInterval(
+                        function() {
+                            newX *= 1.5;
+                            newY *= 1.5;
+                            refreshView(context);
+                            drawImage(egg.img, context, egg.x, egg.y, newX, newY);
+                            if (currentAnimationIteration++ >= animationIterations) {
+                                clearInterval(interval);
+                                refreshView(context);
+                            }
+                        }, 15
+                    );
+                    refreshView(context);
+                }
+            }
+            if (clickedBush !== null) {
+                moveObject = true;
+                clickedObject = clickedBush;
+            }
+        }
+
+        function mouseMoveHandler(event, context) {
+            if (moveObject) {
+                if (clickedObject !== null) {
+                    // only bush in movable
+                    if (clickedObject.type === objectTypes.bush) {
+                        normalizeEvent(event);
+                        var x = event.offsetX;
+                        var y = event.offsetY;
+                        if (y < Y_BUSH_MOUSE_MOVE_LIMIT) {
+                            y = Y_BUSH_MOUSE_MOVE_LIMIT;
+                        }
+                        clickedObject.x = x - Math.floor(clickedObject.img.width / 2);
+                        clickedObject.y = y - Math.floor(clickedObject.img.height / 2);
+                        updateObjCenter(clickedObject);
+                        refreshView(context);
+                    }
+                }
+            }
+        }
+
+        function mouseUpHandler() {
+            moveObject = false;
+        }
+
+        function mouseOutHandler() {
+            if (moveObject) {
+                mouseUpHandler();
+            }
+        }
+
+
+
+        /////////////////////
+        // APP STARTS HERE //
+        /////////////////////
+        $(window).load(
+            function() {
+                var canvas = $(GAME_WINDOW_ID);
+                var domCanvas = canvas[0];
+                var context = domCanvas.getContext("2d");
+                init(context);
+                canvas.mousedown(
+                    function(event) {
+                        mouseDownHandler(event, context);
+                    }
+                );
+                canvas.mousemove(
+                    function(event) {
+                        mouseMoveHandler(event, context);
+                    }
+                );
+                canvas.mouseup(
+                    function(event) {
+                        mouseUpHandler();
+                    }
+                );
+                canvas.mouseout(
+                    function(event) {
+                        mouseOutHandler();
+                    }
+                );
+            }
+        );
+    </script>
+</head>
+
+<body>
+
+    <div id="content">
+        <div id="imgContainer">
+            <img id="bush" src="images/bush0.png" />
+            <img id="tree" src="images/tree0.png" />
+            <img id="background" src="images/background.png" />
+            <img id="easterEgg" src="images/easter-egg.png" />
+        </div>
+        <div id="soundContainer">
+            <audio id="eggPickedUpSound">
 					<source src="audio/beep.mp3"/>
 				</audio>
-				<audio id="successSound">
+            <audio id="successSound">
 					<source src="audio/success.mp3"/>
 				</audio>
-				<audio id="backgroundSound">
+            <audio id="backgroundSound">
 					<source src="audio/naturesounds.ogg"/>
 				</audio>
-			</div>
-			<canvas id="gameWindow" width="1024" height="750">
+        </div>
+        <canvas id="gameWindow" width="1024" height="730">
 			</canvas>
-		</div>
-	</body>
+        <div style="background-color:white;box-shadow:0px 0px 5px 5px black;border-radius:10px">
+            <h4 style="text-align: center; color:black">Move the bushes to find the eggs! Click on all the eggs to win!</h4>
+        </div>
+    </div>
+</body>
+
 </html>

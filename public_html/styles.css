@@ -6,39 +6,38 @@
         Purpose of the stylesheet follows.
 */
 
-root { 
-	display: block;
+root {
+    display: block;
 }
 
-canvas#gameWindow
-{
-	background-color: black;
-	border-color: white;
-	border-style: solid;
+canvas#gameWindow {
+    background-color: black;
+    border-color: white;
+    border-style: solid;
+    margin: 0;
+    border-radius: 10px;
 }
 
-img
-{
-	display: none;
+img {
+    display: none;
 }
 
-body
-{
-	background-image: url("images/background.jpg");
-	background-size: cover;
-	background-position: center;
-	background-repeat: no-repeat;
-	background-color: greenyellow;
+body {
+    background: url("images/background.jpg") center center fixed;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: greenyellow;
+    overflow: hidden;
 }
 
-#content
-{
-	width: 1024px;
-	height: 768px;
-	margin: auto;
+#content {
+    width: 1024px;
+    height: 730px;
+    margin: auto;
+    align-content: center;
 }
 
-audio
-{
-	display: none;
+audio {
+    display: none;
 }
