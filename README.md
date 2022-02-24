@@ -1,4 +1,6 @@
-# eeggs
-Easter eggs hunting game. To run the game, simply open index.html file. Your goal is to find all eggs. Drag bushes to reveal hidden eggs. Have fun :).
+# Easter Egg Hunt
 
-Originally, this project was created for my niece and to learn how to use HTML5 Canvas API.
+An Easter egg hunting game based on the original project by Mike Wojtyna (https://github.com/mikewojtyna/eeggs).
+
+Edit the index.html file to change the variables. 
+Play the game by dragging away the bushes and trees and clicking on the eggs.
